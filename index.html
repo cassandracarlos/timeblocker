@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Time‑Block Scheduler MVP</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    #blocks {
+      width: 250px;
+      background: #f4f4f4;
+      padding: 15px;
+      border-right: 1px solid #ccc;
+      overflow-y: auto;
+    }
+
+    .block {
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #4caf50;
+      color: white;
+      border-radius: 5px;
+      cursor: grab;
+      user-select: none;
+    }
+
+    /* Timeline */
+    #timeline {
+      flex: 1;
+      overflow-y: scroll;
+      padding: 20px;
+      background: #fafafa;
+    }
+
+    .slot {
+      height: 50px;
+      border: 1px solid #ddd;
+      margin-bottom: 5px;
+      position: relative;
+      background: white;
+    }
+
+    .slot-label {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .placed-block {
+      position: absolute;
+      left: 80px;
+      right: 5px;
+      background: #2196f3;
+      color: white;
+      border-radius: 4px;
+      padding: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar: Action Blocks -->
+  <div id="blocks">
+    <h3>Action Blocks</h3>
+
+    <div class="block" draggable="true" data-name="Brush Teeth" data-duration="5">
+      Brush Teeth (5 min)
+    </div>
+
+    <div class="block" draggable="true" data-name="Breakfast" data-duration="20">
+      Breakfast (20 min)
+    </div>
+
+    <div class="block" draggable="true" data-name="Exercise" data-duration="45">
+      Exercise (45 min)
+    </div>
+
+    <div class="block" draggable="true" data-name="Groceries" data-duration="30">
+      Groceries (30 min)
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div id="timeline"></div>
+
+  <script>
+    // Generate time slots (6:00–22:00)
+    const timeline = document.getElementById("timeline");
+    for (let hour = 6; hour <= 22; hour++) {
+      const slot = document.createElement("div");
+      slot.className = "slot";
+      slot.dataset.time = hour + ":00";
+
+      const label = document.createElement("div");
+      label.className = "slot-label";
+      label.textContent = hour + ":00";
+
+      slot.appendChild(label);
+      timeline.appendChild(slot);
+
+      slot.addEventListener("dragover", e => e.preventDefault());
+      slot.addEventListener("drop", onDrop);
+    }
+
+    // Drag start
+    document.querySelectorAll(".block").forEach(block => {
+      block.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("name", block.dataset.name);
+        e.dataTransfer.setData("duration", block.dataset.duration);
+      });
+    });
+
+    // Drop handler
+    function onDrop(e) {
+      const name = e.dataTransfer.getData("name");
+      const duration = parseInt(e.dataTransfer.getData("duration"));
+
+      const placed = document.createElement("div");
+      placed.className = "placed-block";
+      placed.style.height = duration * 1.5 + "px"; // scale duration visually
+      placed.textContent = name + " (" + duration + " min)";
+
+      e.currentTarget.appendChild(placed);
+    }
+  </script>
+
+</body>
+</html>
